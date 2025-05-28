@@ -1,0 +1,184 @@
+/* Font Analiz Sonucu - Sadece _ResultPartial.cshtml için özel stiller */
+
+.stat-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    background: #fff;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.stat-card .card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3436;
+}
+.stat-card .card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.stat-card .progress {
+    background-color: #f0f0f0;
+    border-radius: 2px;
+}
+.stat-card .badge {
+    font-size: 0.875rem;
+    padding: 0.5em 0.8em;
+    border-radius: 6px;
+}
+.font-preview {
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+.font-sample {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    border: 1px solid #dee2e6;
+}
+.progress {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.progress-bar.bg-gradient {
+    background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+}
+.accordion-button {
+    color: #2d3436 !important;
+    font-weight: 500;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+.accordion-button:not(.collapsed) {
+    color: #ffffff !important;
+    background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+    border-color: transparent;
+}
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+    border-color: #6c63ff;
+}
+.accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236c63ff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button span {
+    color: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+.accordion-button .badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+    margin-left: 0.5rem;
+}
+.accordion-button:not(.collapsed) .badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+.accordion-button:not(.collapsed) .badge.bg-primary {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+.accordion-button:not(.collapsed) .badge.bg-secondary {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+}
+.accordion-item {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+}
+.accordion-body {
+    padding: 1.5rem;
+    background-color: #fff;
+}
+.accordion-body .card {
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+.accordion-body .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.accordion-body .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.accordion-body .badge {
+    font-size: 0.875rem;
+    padding: 0.5em 0.8em;
+    border-radius: 6px;
+}
+.accordion-body .text-muted {
+    color: #6c757d !important;
+}
+.url-truncate {
+    max-width: 600px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+@media (max-width: 768px) {
+    .url-truncate {
+        max-width: 200px;
+    }
+}
+.gradient-header {
+    background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+    border: none;
+    border-radius: 12px 12px 0 0;
+}
+.card {
+    border-radius: 12px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.8em;
+}
+.table > :not(caption) > * > * {
+    padding: 1rem;
+}
+.btn-outline-primary {
+    border-color: #6c63ff;
+    color: #6c63ff;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover {
+    background-color: #6c63ff;
+    color: white;
+    border-color: #6c63ff;
+}
+.accordion-button:not(.collapsed) .btn-outline-primary {
+    border-color: white;
+    color: white;
+}
+.accordion-button:not(.collapsed) .btn-outline-primary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+} 

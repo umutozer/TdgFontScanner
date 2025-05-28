@@ -1,0 +1,165 @@
+:root {
+    --primary-bg: #f6f7fb;
+    --card-bg: #ffffff;
+    --primary: #3a3d5c;
+    --accent: #6c63ff;
+    --secondary: #43e6b0;
+    --danger: #ff6b6b;
+    --text-main: #232946;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 4px 24px rgba(60,72,100,0.08);
+}
+
+body {
+    background: var(--primary-bg);
+    color: var(--text-main);
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-size: 1.05rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+header, footer {
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+}
+
+.navbar {
+    background: var(--card-bg) !important;
+    border-radius: 1rem;
+    margin-top: 1rem;
+    padding: 0.5rem 0;
+    height: 60px;
+}
+
+.navbar-brand, .nav-link {
+    color: var(--primary) !important;
+    font-weight: 600;
+}
+
+.nav-link.active, .nav-link:hover {
+    color: var(--accent) !important;
+}
+
+.main-container {
+    position: relative;
+    z-index: 1;
+    margin-top: 1rem;
+}
+
+.wave-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 300px;
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: wave 20s ease-in-out infinite alternate;
+}
+
+.wave1 {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="%236c63ff" fill-opacity="0.1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+}
+
+.wave2 {
+    opacity: 0.5;
+    animation: wave 15s ease-in-out infinite alternate-reverse;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="%236c63ff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+}
+
+.wave3 {
+    opacity: 0.3;
+    animation: wave 10s ease-in-out infinite alternate;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none"><path fill="%236c63ff" fill-opacity="0.1" d="M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,154.7C672,149,768,171,864,181.3C960,192,1056,192,1152,181.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+}
+
+@keyframes wave {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) scale(1.1);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+form {
+   /* background: var(--card-bg);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow);
+    padding: 2rem 2.5rem;
+    margin: 2rem auto;*/
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.form-group {
+    margin: 10px 0;
+}
+
+input[type="text"], input[type="number"] {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    background: #f9fafb;
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+button[type="submit"] {
+    background: linear-gradient(90deg, var(--accent), var(--secondary));
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.6rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 1rem;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, var(--secondary), var(--accent));
+    transform: translateY(-2px) scale(1.03);
+}
+
+h2 {
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+label {
+    color: var(--text-muted);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+}

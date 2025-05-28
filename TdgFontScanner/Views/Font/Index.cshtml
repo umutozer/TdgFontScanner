@@ -1,0 +1,279 @@
+﻿@{
+    ViewData["Title"] = "Font Analiz Aracı";
+    var maxPage = ViewBag.MaxPage ?? 10;
+    var maxDeep = ViewBag.MaxDeep ?? 3;
+}
+
+<div class="text-center mb-4">
+    <div class="d-flex align-items-center justify-content-center gap-3">
+        <div class="logo-container">
+            <svg width="64" height="64" fill="none" viewBox="0 0 48 48">
+                <rect width="48" height="48" rx="12" fill="#6c63ff" />
+                <text x="24" y="30" text-anchor="middle" font-size="20" fill="#fff" font-family="Segoe UI, Arial, sans-serif">Aa</text>
+            </svg>
+        </div>
+        <h2 class="mb-0">Font Analiz Aracı</h2>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-4">
+        <form id="fontAnalyzerForm" method="post" asp-action="Analyze">
+            <div class="form-group mb-4">
+                <label for="domain" class="form-label">
+                    <i class="fas fa-globe me-1"></i>Web Sitesi URL'si:
+                </label>
+                <input type="text" class="form-control" name="domain" placeholder="https://example.com" required />
+                <div class="form-text text-muted mt-2">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Önemli Bilgiler:</strong>
+                    <ul class="mt-2 mb-0">
+                        <li>Analiz etmek istediğiniz web sitesinin tam adresini giriniz (örn: https://ornek.com)</li>
+                        <li>URL'nin başında "http://" veya "https://" olmalıdır</li>
+                        <li>Alt alan adları (subdomain) desteklenmektedir</li>
+                        <li>Bazı siteler güvenlik nedeniyle analiz edilemeyebilir</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="maxPage" class="form-label">
+                            <i class="fas fa-file-alt me-1"></i>Maksimum Sayfa Sayısı:
+                        </label>
+                        <input type="number" class="form-control" id="maxPage" name="maxPage" value="@maxPage" min="1" />
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Nasıl Çalışır?</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>Analiz sırasında taranacak maksimum sayfa sayısını belirler</li>
+                                <li>Düşük değerler (10-50) daha hızlı analiz sağlar</li>
+                                <li>Orta değerler (50-200) genel siteler için uygundur</li>
+                                <li>Yüksek değerler (200-1000) kurumsal siteler için önerilir</li>
+                                <li>Çok yüksek değerler (1000+) analiz süresini uzatabilir</li>
+                                <li>Önerilen değer aralıkları:
+                                    <ul>
+                                        <li>Blog/Small Site: 50-100</li>
+                                        <li>Kurumsal Site: 200-500</li>
+                                        <li>E-ticaret: 500-1000</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="maxDeep" class="form-label">
+                            <i class="fas fa-sitemap me-1"></i>Tarama Derinliği:
+                        </label>
+                        <input type="number" class="form-control" id="maxDeep" name="maxDeep" value="@maxDeep" min="1" />
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Nasıl Çalışır?</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>Ana sayfadan itibaren kaç seviye derinliğe kadar taranacağını belirler</li>
+                                <li>1 = Sadece ana sayfa</li>
+                                <li>2 = Ana sayfa + bağlantılı sayfalar</li>
+                                <li>3 = Ana sayfa + bağlantılı sayfalar + onların bağlantılı sayfaları</li>
+                                <li>Önerilen değer: 2-3 arası</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary gradient-button">
+                    <i class="fas fa-search me-2"></i>Analize Başla
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="loading-container" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9999; flex-direction: column; justify-content: center; align-items: center;">
+    <div id="lottie-animation" style="width: 200px; height: 200px;"></div>
+    <p class="mt-3" style="color: white;">Analiz yapılıyor, lütfen bekleyiniz...</p>
+</div>
+
+<div id="result-container" class="mt-4"></div>
+
+<style>
+    .main-container{
+        margin-top:30px;
+    }
+    .gradient-button {
+        background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .gradient-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(108, 99, 255, 0.2);
+    }
+    .logo-container {
+        background: white;
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(108, 99, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    .logo-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(108, 99, 255, 0.15);
+    }
+    h2 {
+        color: #2d3436;
+        font-weight: 600;
+        font-size: 2.2rem;
+        background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        transition: all 0.3s ease;
+    }
+    .d-flex:hover h2 {
+        transform: scale(1.02);
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+   
+       
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var animation = null;
+
+            const form = document.getElementById('fontAnalyzerForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const loadingContainer = document.getElementById('loading-container');
+                loadingContainer.style.display = 'flex';
+
+                const resultContainer = document.getElementById('result-container');
+                resultContainer.innerHTML = '';
+
+                if (!animation) {
+                    animation = lottie.loadAnimation({
+                        container: document.getElementById('lottie-animation'),
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: 'https://assets5.lottiefiles.com/packages/lf20_usmfx6bp.json'
+                    });
+                } else {
+                    animation.play();
+                }
+
+                fetch('/Font/Analyze', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Sunucu hatası');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    if (animation) {
+                        animation.stop();
+                    }
+                    loadingContainer.style.display = 'none';
+                    resultContainer.innerHTML = html;
+                    
+                    // Sonuçlar yüklendikten sonra smooth scroll animasyonu
+                    resultContainer.scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+
+                    if (animation) {
+                        animation.stop();
+                    }
+                    loadingContainer.style.display = 'none';
+                    resultContainer.innerHTML = `<div class="alert alert-danger">İşlem sırasında bir hata oluştu: ${error.message}</div>`;
+                });
+            });
+        });
+
+
+
+
+
+         function exportToPdf() {
+            try {
+                const analysisId = document.getElementById('analysisId').value;
+                if (!analysisId) {
+                    alert('Analiz verisi bulunamadı. Lütfen önce analiz yapın.');
+                    return;
+                }
+
+                const url = '@Url.Action("ExportPdf", "Font")';
+
+                // Form oluştur ve verileri gönder
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                form.target = '_blank';
+
+                const dataInput = document.createElement('input');
+                dataInput.type = 'hidden';
+                dataInput.name = 'analysisId';
+                dataInput.value = analysisId;
+                form.appendChild(dataInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            } catch (error) {
+                console.error('PDF export hatası:', error);
+                alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        }
+
+        function exportToExcel() {
+            try {
+                const analysisId = document.getElementById('analysisId').value;
+                if (!analysisId) {
+                    alert('Analiz verisi bulunamadı. Lütfen önce analiz yapın.');
+                    return;
+                }
+
+                const url = '@Url.Action("ExportExcel", "Font")';
+
+                // Form oluştur ve verileri gönder
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                form.target = '_blank';
+
+                const dataInput = document.createElement('input');
+                dataInput.type = 'hidden';
+                dataInput.name = 'analysisId';
+                dataInput.value = analysisId;
+                form.appendChild(dataInput);
+
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            } catch (error) {
+                console.error('Excel export hatası:', error);
+                alert('Excel dosyası oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+            }
+        }
+    </script>
+}

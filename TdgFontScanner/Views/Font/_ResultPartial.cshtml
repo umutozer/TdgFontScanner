@@ -1,0 +1,456 @@
+@{
+    Layout = null;
+}
+@model List<PageFontReport>
+
+<div class="results-container mt-4">
+    @if (ViewBag.CrawlInfo != null)
+    {
+        <div class="alert alert-info mb-3">
+            <i class="fas fa-info-circle me-2"></i>@ViewBag.CrawlInfo
+        </div>
+    }
+
+    <!-- Export Butonları -->
+    <div class="d-flex justify-content-end mb-4">
+        <div class="btn-group">
+            <button onclick="exportToPdf()" class="btn btn-danger">
+                <i class="fas fa-file-pdf me-2"></i>PDF İndir
+            </button>
+            <button onclick="exportToExcel()" class="btn btn-success">
+                <i class="fas fa-file-excel me-2"></i>Excel İndir
+            </button>
+        </div>
+    </div>
+
+    <!-- Analiz ID'sini gizli input olarak sakla -->
+    <input type="hidden" id="analysisId" value="@ViewBag.AnalysisId" />
+
+    <!-- Genel İstatistikler -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="card-subtitle text-muted mb-1">Sayfa Kapsamı</h6>
+                            <h3 class="card-title mb-0">@Math.Round(ViewBag.PageStats.FontCoverage, 1)%</h3>
+                            <small class="text-muted">@ViewBag.PageStats.PagesWithFonts / @ViewBag.PageStats.TotalPages sayfa</small>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-primary" style="width: @ViewBag.PageStats.FontCoverage%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="card-subtitle text-muted mb-1">Font Dağılımı</h6>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <small class="text-muted d-block">Sistem</small>
+                                    <span class="badge bg-primary">@ViewBag.PageStats.SystemFonts</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Özel</small>
+                                    <span class="badge bg-secondary">@ViewBag.PageStats.CustomFonts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-success" style="width: @ViewBag.PageStats.SystemFontRatio%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="card-subtitle text-muted mb-1">Font Kullanımı</h6>
+                            <h3 class="card-title mb-0">@Math.Round(ViewBag.PageStats.AverageFontsPerPage, 1)</h3>
+                            <small class="text-muted">@ViewBag.PageStats.TotalFonts toplam kullanım</small>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-info" style="width: @((ViewBag.PageStats.AverageFontsPerPage * 100.0) / 10)%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="card-subtitle text-muted mb-1">En Çok Kullanılan</h6>
+                            <h3 class="card-title mb-0">@ViewBag.PageStats.MostUsedFontCount</h3>
+                            <small class="text-muted">@ViewBag.PageStats.MostUsedFont</small>
+                        </div>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-warning" style="width: @((ViewBag.PageStats.MostUsedFontCount * 100.0) / ViewBag.PageStats.TotalFonts)%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Font Analiz Özeti -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header gradient-header text-white">
+            <h4 class="mb-0"><i class="fas fa-font me-2"></i>Font Analiz Özeti</h4>
+        </div>
+        <div class="card-body">
+            @if (ViewBag.FontSummary != null && ViewBag.FontSummary.Count > 0)
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30%">Font Adı</th>
+                                <th style="width: 15%">Kullanım</th>
+                                <th style="width: 15%">Sayfa Sayısı</th>
+                                <th style="width: 20%">Kullanım Oranı</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var totalCount = ((IEnumerable<dynamic>)ViewBag.FontSummary).Sum(f => (int)f.TotalCount);
+                                var totalPages = ViewBag.PageStats.TotalPages;
+                            }
+                            @foreach (var font in ViewBag.FontSummary)
+                            {
+                                var percentage = (font.TotalCount * 100.0) / totalCount;
+                                var relativeSize = (font.UsedInPages * 100.0) / totalPages;
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="font-preview me-3" style="font-family: @font.FontName; font-size: 1.2em;">
+                                                @font.FontName
+                                            </div>
+                                            <div class="font-sample" style="font-family: @font.FontName">
+                                                Aa
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-primary rounded-pill me-2">@font.TotalCount</span>
+                                            <small class="text-muted">kullanım</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@font.UsedInPages sayfa</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress-wrapper">
+                                            <div class="d-flex justify-content-between mb-1">
+                                                <small class="text-muted">Kullanım: @Math.Round(percentage, 1)%</small>
+                                                <small class="text-muted">Sayfa: @Math.Round(relativeSize, 1)%</small>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-gradient" role="progressbar" 
+                                                     style="width: @percentage%;" 
+                                                     aria-valuenow="@percentage" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sayfa Detayları -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header gradient-header text-white">
+                <h4 class="mb-0"><i class="fas fa-file-alt me-2"></i>Sayfa Detayları</h4>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="pageAccordion">
+                    @foreach (var report in Model)
+                    {
+                        <div class="accordion-item">
+                            <div class="accordion-header" id="heading@(report.PageUrl.GetHashCode())">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse@(report.PageUrl.GetHashCode())" aria-expanded="false">
+                                    <div class="d-flex justify-content-between w-100 me-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="url-truncate">@report.PageUrl</span>
+                                            <a href="@report.PageUrl" target="_blank" class="btn btn-sm btn-outline-primary ms-2" 
+                                               onclick="event.stopPropagation();" title="Sayfaya Git">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <span class="badge bg-primary rounded-pill me-2">
+                                            @(report.FontUsage?.Count ?? 0) Font
+                                        </span>
+                                            <span class="badge bg-secondary rounded-pill">
+                                                @(report.FontUsage?.Sum(f => f.Value) ?? 0) Kullanım
+                                            </span>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                            <div id="collapse@(report.PageUrl.GetHashCode())" class="accordion-collapse collapse" 
+                                 data-bs-parent="#pageAccordion">
+                                <div class="accordion-body">
+                                    @if (report.FontUsage != null && report.FontUsage.Any())
+                                    {
+                                        <div class="row">
+                                            @foreach (var font in report.FontUsage.OrderByDescending(f => f.Value))
+                                            {
+                                                <div class="col-md-4 mb-3">
+                                                    <div class="card h-100">
+                                                        <div class="card-body">
+                                                            <h6 class="card-title font-preview" style="font-family: @font.Key">
+                                                                @font.Key
+                                                            </h6>
+                                                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                                                <span class="badge bg-primary">@font.Value kullanım</span>
+                                                                <span class="badge bg-info">@Math.Round((font.Value * 100.0) / report.FontUsage.Sum(f => f.Value), 1)%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Bu sayfada font kullanımı bulunamadı.
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Analiz sonucu bulunamadı veya bir hata oluştu.
+        </div>
+    }
+</div>
+
+
+
+<style>
+    .stat-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        background: #fff;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .stat-card .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3436;
+    }
+    .stat-card .card-subtitle {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .stat-card .progress {
+        background-color: #f0f0f0;
+        border-radius: 2px;
+    }
+    .stat-card .badge {
+        font-size: 0.875rem;
+        padding: 0.5em 0.8em;
+        border-radius: 6px;
+    }
+    .font-preview {
+        font-size: 1.1em;
+        line-height: 1.5;
+    }
+    .font-sample {
+        background: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 1.2em;
+        border: 1px solid #dee2e6;
+    }
+    .progress {
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .progress-bar.bg-gradient {
+        background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+    }
+    .accordion-button {
+        color: #2d3436 !important;
+        font-weight: 500;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+        padding: 1rem;
+    }
+    .accordion-button:not(.collapsed) {
+        color: #ffffff !important;
+        background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+        border-color: transparent;
+    }
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+        border-color: #6c63ff;
+    }
+    .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236c63ff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+    .accordion-button span {
+        /* color: inherit; */
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    .accordion-button .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+        margin-left: 0.5rem;
+    }
+    .accordion-button:not(.collapsed) .badge {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    .accordion-button:not(.collapsed) .badge.bg-primary {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    .accordion-button:not(.collapsed) .badge.bg-secondary {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    .accordion-item {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+    }
+    .accordion-body {
+        padding: 1.5rem;
+        background-color: #fff;
+    }
+    .accordion-body .card {
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    .accordion-body .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .accordion-body .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .accordion-body .badge {
+        font-size: 0.875rem;
+        padding: 0.5em 0.8em;
+        border-radius: 6px;
+    }
+    .accordion-body .text-muted {
+        color: #6c757d !important;
+    }
+    .url-truncate {
+        max-width: 600px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+    }
+    @@media (max-width: 768px) {
+        .url-truncate {
+            max-width: 200px;
+        }
+    }
+    .gradient-header {
+        background: linear-gradient(45deg, #6c63ff, #4BC0C0);
+        border: none;
+        border-radius: 12px 12px 0 0;
+    }
+    .card {
+        border-radius: 12px;
+        border: none;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .badge {
+        font-size: 0.9em;
+        padding: 0.5em 0.8em;
+    }
+    .table > :not(caption) > * > * {
+        padding: 0.5rem;
+    }
+    .btn-outline-primary {
+        border-color: #6c63ff;
+        color: #6c63ff;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    .btn-outline-primary:hover {
+        background-color: #6c63ff;
+        color: white;
+        border-color: #6c63ff;
+    }
+    .accordion-button:not(.collapsed) .btn-outline-primary {
+        border-color: white;
+        color: white;
+    }
+    .accordion-button:not(.collapsed) .btn-outline-primary:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+</style>
